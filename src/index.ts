@@ -1,7 +1,7 @@
 
 import {InputService, INPUT_KITTENS, EXAMPLE} from './InputService';
 
- InputService.read(EXAMPLE);
+InputService.read(EXAMPLE);
 /*
 const POPULATION_SIZE = 100;
 const ITERATIONS_NUMBER = 1000;
