@@ -1,12 +1,7 @@
 import { InputService, INPUT_KITTENS, EXAMPLE, FileStructure } from './InputService';
 import { PopulationService, Population, SolutionContainer } from './PopulationService';
 
-InputService.read(EXAMPLE).then((fileStructure: FileStructure) => {
-
-    run(fileStructure);
-
-//    console.log(JSON.stringify((PopulationService.generatePopulation(10, fileStructure))));
-});
+InputService.read(EXAMPLE).then((fileStructure: FileStructure) => console.log(PopulationService.generatePopulation(100, fileStructure)));
 
 function run(input: FileStructure) {
     const POPULATION_SIZE = 100;

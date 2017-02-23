@@ -1,10 +1,7 @@
 "use strict";
 var InputService_1 = require('./InputService');
 var PopulationService_1 = require('./PopulationService');
-InputService_1.InputService.read(InputService_1.EXAMPLE).then(function (fileStructure) {
-    run(fileStructure);
-    //    console.log(JSON.stringify((PopulationService.generatePopulation(10, fileStructure))));
-});
+InputService_1.InputService.read(InputService_1.EXAMPLE).then(function (fileStructure) { return console.log(PopulationService_1.PopulationService.generatePopulation(100, fileStructure)); });
 function run(input) {
     var POPULATION_SIZE = 100;
     var ITERATIONS_NUMBER = 1000;
@@ -15,7 +12,6 @@ function run(input) {
             solutions: []
         };
         while (new_generation.solutions.length < POPULATION_SIZE) {
-            console.log("here");
             var chosen = SelectChildren(population);
             chosen = CrossChildren(chosen); // calculates score as well
             chosen = MutateChildren(chosen);

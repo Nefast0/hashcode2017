@@ -9,6 +9,12 @@ export interface FileStructure {
     cacheSizes: number[];
     videoSizes: number[];
     endpoints: Endpoint[];
+    endpointRequests: EndpointRequest[];
+}
+export interface EndpointRequest {
+    count: number;
+    videoNumber: number;
+    endpoint: number;
 }
 export interface Endpoint {
     dataCenterLatency: number;

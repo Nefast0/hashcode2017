@@ -13,6 +13,13 @@ export interface FileStructure {
     cacheSizes: number[];
     videoSizes: number[];
     endpoints: Endpoint[];
+    endpointRequests: EndpointRequest[];
+}
+
+export interface EndpointRequest {
+    count: number;
+    videoNumber: number;
+    endpoint: number;
 }
 
 export interface Endpoint {
@@ -29,6 +36,9 @@ export class _InputService {
         var currentlyEndpointDescription = false;
         var nextNLinesAreEndpointCacheDescriptions = 0;
         var currentEndpoint: Endpoint = null;
+        var startReadingRequests: boolean = false;
+        var endpointsRead = 0;
+        var endpointDescriptionsRead = 0;
         const thisReference = this;
 
         let fileStructure: FileStructure;
@@ -50,7 +60,8 @@ export class _InputService {
                             cacheCount: +splitLine[3],
                             videoSizes: [],
                             cacheSizes: [],
-                            endpoints: []
+                            endpoints: [],
+                            endpointRequests: []
                         };
 
                         for (let x = 0; x < fileStructure.cacheCount; x++) {
@@ -67,10 +78,12 @@ export class _InputService {
                         return;
                     }
 
-                    if (nextNLinesAreEndpointCacheDescriptions--) {
+                    if (nextNLinesAreEndpointCacheDescriptions-- > 0) {
                         currentEndpoint.connectedCacheLatencies[+splitLine[0]] = +splitLine[1];
 
-                        if (nextNLinesAreEndpointCacheDescriptions == 0) {
+                        if (nextNLinesAreEndpointCacheDescriptions == 0 && endpointsRead == fileStructure.endpointCount) {
+                            startReadingRequests = true;
+                        } else if (nextNLinesAreEndpointCacheDescriptions == 0) {
                             currentlyEndpointDescription = true;
                         }
 
@@ -88,10 +101,34 @@ export class _InputService {
                         fileStructure.endpoints.push(currentEndpoint);
                         currentlyEndpointDescription = false;
                         nextNLinesAreEndpointCacheDescriptions = currentEndpoint.cacheCount;
+                        endpointsRead++;
+
+                        if (endpointsRead == fileStructure.endpointCount) {
+                            startReadingRequests = true;
+                        }
+
                         return;
                     }
 
-                    resolve(fileStructure);
+                    if (startReadingRequests) {
+
+
+                        if (endpointDescriptionsRead == fileStructure.requestDescriptionCount) {
+                            resolve(fileStructure);
+                            return;
+                        }
+
+                        endpointDescriptionsRead++;
+
+                        fileStructure.endpointRequests.push({
+                            count: +splitLine[2],
+                            videoNumber: +splitLine[0],
+                            endpoint: +splitLine[1]
+                        });
+
+                        return;
+                    }
+
                 });
             });
         });
