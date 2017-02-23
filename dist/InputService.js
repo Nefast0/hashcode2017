@@ -5,17 +5,29 @@ var _InputService = (function () {
         this.currentLineNumber = 0;
     }
     _InputService.prototype.read = function (filename) {
+        var _this = this;
         this.currentLineNumber = 0;
         var thisReference = this;
         var lineReader = require('readline').createInterface({
             input: require('fs').createReadStream(filename)
         });
+        var fileStructure;
         lineReader.on('line', function (line) {
-            console.log(thisReference.currentLineNumber);
-            if (this.currentLineNumber === 0) {
-                console.log(line);
+            if (_this.currentLineNumber === 0) {
+                var splitLine = line.split(' ');
+                fileStructure = {
+                    videoCount: +splitLine[0],
+                    endpointCount: +splitLine[1],
+                    requestDescriptionCount: +splitLine[2],
+                    cacheCount: +splitLine[3],
+                    cacheSizes: []
+                };
+                for (var x = 0; x < fileStructure.cacheCount; x++) {
+                    fileStructure.cacheSizes.push(+splitLine[4]);
+                }
+                console.log(fileStructure);
             }
-            this.currentLineNumber++;
+            _this.currentLineNumber++;
         });
     };
     return _InputService;
