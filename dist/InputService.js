@@ -11,6 +11,9 @@ var _InputService = (function () {
         var currentlyEndpointDescription = false;
         var nextNLinesAreEndpointCacheDescriptions = 0;
         var currentEndpoint = null;
+        var startReadingRequests = false;
+        var endpointsRead = 0;
+        var endpointDescriptionsRead = 0;
         var thisReference = this;
         var fileStructure;
         return new es6_promise_1.Promise(function (resolve, reject) {
@@ -26,7 +29,8 @@ var _InputService = (function () {
                             cacheCount: +splitLine[3],
                             videoSizes: [],
                             cacheSizes: [],
-                            endpoints: []
+                            endpoints: [],
+                            endpointRequests: []
                         };
                         for (var x = 0; x < fileStructure.cacheCount; x++) {
                             fileStructure.cacheSizes.push(+splitLine[4]);
@@ -38,9 +42,12 @@ var _InputService = (function () {
                         currentlyEndpointDescription = true;
                         return;
                     }
-                    if (nextNLinesAreEndpointCacheDescriptions--) {
+                    if (nextNLinesAreEndpointCacheDescriptions-- > 0) {
                         currentEndpoint.connectedCacheLatencies[+splitLine[0]] = +splitLine[1];
-                        if (nextNLinesAreEndpointCacheDescriptions == 0) {
+                        if (nextNLinesAreEndpointCacheDescriptions == 0 && endpointsRead == fileStructure.endpointCount) {
+                            startReadingRequests = true;
+                        }
+                        else if (nextNLinesAreEndpointCacheDescriptions == 0) {
                             currentlyEndpointDescription = true;
                         }
                         return;
@@ -54,9 +61,25 @@ var _InputService = (function () {
                         fileStructure.endpoints.push(currentEndpoint);
                         currentlyEndpointDescription = false;
                         nextNLinesAreEndpointCacheDescriptions = currentEndpoint.cacheCount;
+                        endpointsRead++;
+                        if (endpointsRead == fileStructure.endpointCount) {
+                            startReadingRequests = true;
+                        }
                         return;
                     }
-                    resolve(fileStructure);
+                    if (startReadingRequests) {
+                        if (endpointDescriptionsRead == fileStructure.requestDescriptionCount) {
+                            resolve(fileStructure);
+                            return;
+                        }
+                        endpointDescriptionsRead++;
+                        fileStructure.endpointRequests.push({
+                            count: +splitLine[2],
+                            videoNumber: +splitLine[0],
+                            endpoint: +splitLine[1]
+                        });
+                        return;
+                    }
                 });
             });
         });

@@ -1,4 +1,5 @@
 import { FileStructure } from '../src/InputService';
+import { ScoringService } from './ScroingService';
 
 export interface SolutionContainer {
     solution: {[key: number]: number[]}
@@ -40,7 +41,9 @@ export class _PopulationService {
                         break;
                     }
                 }
+
             }
+            solutionContainer.score = ScoringService.score(solutionContainer, input);
         }
 
         return population;
