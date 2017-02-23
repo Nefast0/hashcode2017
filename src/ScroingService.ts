@@ -16,8 +16,6 @@ export class _ScoringService {
 
             let requestTimeSaved = 0;
 
-            console.log(endpointRequest);
-
             endPointCaches.forEach((value, index) => {
                 if (!value) return;
 

@@ -9,7 +9,6 @@ var _ScoringService = (function () {
             totalRequests += endpointRequest.count;
             var endPointCaches = input.endpoints[endpointRequest.endpoint].connectedCacheLatencies;
             var requestTimeSaved = 0;
-            console.log(endpointRequest);
             endPointCaches.forEach(function (value, index) {
                 if (!value)
                     return;
