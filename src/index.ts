@@ -1,7 +1,7 @@
 
 import {InputService, INPUT_KITTENS, EXAMPLE} from './InputService';
 
-input = InputService.read(EXAMPLE);
+var input = InputService.read(EXAMPLE);
 
 const POPULATION_SIZE = 100;
 const ITERATIONS_NUMBER = 1000;
@@ -39,3 +39,32 @@ population.foreach( function(solution)
 });
 
 OutputService.write(best);
+
+function SelectChildren(population)
+{
+  const k = 10;
+
+  var chosen = [];
+  var taken = {};
+  for (var i = 0; i < k; i++ )
+  {
+    var r = Math.floor(Math.random()*population.length);
+    if (!taken[r])
+    {
+      chosen.add(population[r]);
+      taken[r] = true;
+    }
+  };
+
+  return chosen;
+};
+
+function CrossChildren(chosen)
+{
+  return chosen;
+}
+
+function MutateChildren(chosen)
+{
+  return chosen;
+}
