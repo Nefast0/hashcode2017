@@ -10,6 +10,7 @@ InputService.read(EXAMPLE).then((fileStructure: FileStructure) => {
 
 function run(input: FileStructure) {
     const POPULATION_SIZE = 100;
+    const K = POPULATION_SIZE / 10;
     const ITERATIONS_NUMBER = 1000;
 
     let population = PopulationService.generatePopulation(POPULATION_SIZE, input);
@@ -21,7 +22,7 @@ function run(input: FileStructure) {
         };
 
         while (new_generation.solutions.length < POPULATION_SIZE) {
-            var chosen = SelectChildren(population);
+            var chosen = SelectChildren(population, k);
             chosen = CrossChildren(chosen); // calculates score as well
             chosen = MutateChildren(chosen);
 
@@ -42,9 +43,7 @@ function run(input: FileStructure) {
 }
 
 
-function SelectChildren(population): SolutionContainer[] {
-    const k = 10;
-
+function SelectChildren(population, k): SolutionContainer[] {
     var chosen: SolutionContainer[] = [];
     var taken = {};
     for (var i = 0; i < k; i++) {
@@ -55,13 +54,65 @@ function SelectChildren(population): SolutionContainer[] {
         }
     }
 
-    return chosen;
+    return chosen.sort( function(a, b) {
+        return b.score - a.score;
+    }).slice(0, 2);
 }
 
 function CrossChildren(chosen) {
+    if (Math.random() > 0.5) {
+        return CrossChildern1(chosen);
+    }
+    return CrossChildren2(chosen);
+}
+
+function CrossChildren1(chosen) {
+    let firstDude = chosen[0];
+    let secondDude = chosen[1];
+    let l = firstDude.solution.length;
+
+    for (var i = 0; i < l; i+=2) {
+        firstDude.solution[i] = secondDude.solution[i];
+    }
+
+    return chosen;
+}
+
+function CrossChildren2(choosen) {
+    let firstDude = chosen[0];
+    let secondDude = chosen[1];
+    let l = firstDude.solution.length;
+
+    for (var i = 0; i < l; i++) {
+        let firstList = firstDude.solution[i];
+        let secondList = secondDude.solution[i];
+
+        let newFirstList = [];
+        let newSecondList = [];
+
+        for (var j = 0; j < firstList.length; j++) {
+            if (j%2 == 0) {
+                newFirstList.push(firstList[j]);
+            } else {
+                newSecondList.push(firstList[j]);
+            }
+        }
+        for (var j = 0; j < secondList.length; j++) {
+            if (j%2 == 0) {
+                newSecondList.push(firstList[j]);
+            } else {
+                newFirstList.push(firstList[j]);
+            }
+        }
+
+        firstDude.solution[i] = newFirstList;
+        secondDude.solution[i] = newSecndList;
+    }
+
     return chosen;
 }
 
 function MutateChildren(chosen) {
+    
     return chosen;
 }
