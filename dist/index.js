@@ -88,5 +88,13 @@ function CrossChildren2(chosen) {
     return chosen;
 }
 function MutateChildren(chosen) {
+    for (var i = 0; i < chosen.length; i++) {
+        if (Math.random() < 0.01) {
+            chosen[i] = MutateChild(chosen[i]);
+        }
+    }
+    return chosen;
+}
+function MutateChild(chosen) {
     return chosen;
 }
