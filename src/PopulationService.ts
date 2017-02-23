@@ -12,41 +12,58 @@ export interface Population {
 
 export class _PopulationService {
 
-    public generatePopulation(populationSize: number, input: FileStructure) {
+    public generatePopulation(populationSize: number, input: FileStructure): Population {
 
-        const population: Population = {
-            solutions: []
+        const asd: Population = {
+            solutions: [{
+                solution: {
+                    0: [2],
+                    1: [3, 1],
+                    2: [0, 1]
+                },
+                score: -1
+            }]
         };
 
-        for (var x = 0; x < populationSize; x++) {
+        asd.solutions[0].score = ScoringService.score(asd.solutions[0], input);
 
-            const solutionContainer: SolutionContainer = {
-                score: -1,
-                solution: {}
-            };
-            population.solutions.push(solutionContainer);
+        return asd;
 
-            for (var y = 0; y < input.cacheCount; y++) {
-                solutionContainer.solution[y] = [];
+        /*
+         const population: Population = {
+         solutions: []
+         };
 
-                let currentCacheSize = 0;
+         for (var x = 0; x < populationSize; x++) {
 
-                while (true) {
-                    const randomVideoIndex = Math.floor(Math.random() * input.videoCount);
+         const solutionContainer: SolutionContainer = {
+         score: -1,
+         solution: {}
+         };
+         population.solutions.push(solutionContainer);
 
-                    if (currentCacheSize + input.videoSizes[randomVideoIndex] < input.cacheSizes[y]) {
-                        solutionContainer.solution[y].push(randomVideoIndex);
-                        currentCacheSize += input.videoSizes[randomVideoIndex];
-                    } else {
-                        break;
-                    }
-                }
+         for (var y = 0; y < input.cacheCount; y++) {
+         solutionContainer.solution[y] = [];
 
-            }
-            solutionContainer.score = ScoringService.score(solutionContainer, input);
-        }
+         let currentCacheSize = 0;
 
-        return population;
+         while (true) {
+         const randomVideoIndex = Math.floor(Math.random() * input.videoCount);
+
+         if (currentCacheSize + input.videoSizes[randomVideoIndex] < input.cacheSizes[y]) {
+         solutionContainer.solution[y].push(randomVideoIndex);
+         currentCacheSize += input.videoSizes[randomVideoIndex];
+         } else {
+         break;
+         }
+         }
+
+         }
+         solutionContainer.score = ScoringService.score(solutionContainer, input);
+         }
+
+         return population;
+         */
     }
 }
 

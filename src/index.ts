@@ -17,7 +17,7 @@ function run(input: FileStructure) {
         };
 
         while (new_generation.solutions.length < POPULATION_SIZE) {
-            var chosen = SelectChildren(population, k);
+            var chosen = SelectChildren(population, K);
             chosen = CrossChildren(chosen); // calculates score as well
             chosen = MutateChildren(chosen);
 
@@ -49,14 +49,14 @@ function SelectChildren(population, k): SolutionContainer[] {
         }
     }
 
-    return chosen.sort( function(a, b) {
+    return chosen.sort(function (a, b) {
         return b.score - a.score;
     }).slice(0, 2);
 }
 
 function CrossChildren(chosen) {
     if (Math.random() > 0.5) {
-        return CrossChildern1(chosen);
+        return CrossChildren1(chosen);
     }
     return CrossChildren2(chosen);
 }
@@ -66,14 +66,14 @@ function CrossChildren1(chosen) {
     let secondDude = chosen[1];
     let l = firstDude.solution.length;
 
-    for (var i = 0; i < l; i+=2) {
+    for (var i = 0; i < l; i += 2) {
         firstDude.solution[i] = secondDude.solution[i];
     }
 
     return chosen;
 }
 
-function CrossChildren2(choosen) {
+function CrossChildren2(chosen) {
     let firstDude = chosen[0];
     let secondDude = chosen[1];
     let l = firstDude.solution.length;
@@ -86,14 +86,14 @@ function CrossChildren2(choosen) {
         let newSecondList = [];
 
         for (var j = 0; j < firstList.length; j++) {
-            if (j%2 == 0) {
+            if (j % 2 == 0) {
                 newFirstList.push(firstList[j]);
             } else {
                 newSecondList.push(firstList[j]);
             }
         }
         for (var j = 0; j < secondList.length; j++) {
-            if (j%2 == 0) {
+            if (j % 2 == 0) {
                 newSecondList.push(firstList[j]);
             } else {
                 newFirstList.push(firstList[j]);
@@ -101,13 +101,13 @@ function CrossChildren2(choosen) {
         }
 
         firstDude.solution[i] = newFirstList;
-        secondDude.solution[i] = newSecndList;
+        secondDude.solution[i] = newSecondList;
     }
 
     return chosen;
 }
 
 function MutateChildren(chosen) {
-    
+
     return chosen;
 }

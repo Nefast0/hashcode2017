@@ -16,14 +16,24 @@ export class _ScoringService {
 
             let requestTimeSaved = 0;
 
+            console.log(endpointRequest);
+
             endPointCaches.forEach((value, index) => {
                 if (!value) return;
 
+//                console.log("Inside cache:" + solutionContainer.solution[index]);
+
                 // Cache number 'index' has video
-                if (solutionContainer.solution[index].indexOf(endpointRequest.videoNumber)) {
-                    requestTimeSaved = input.endpoints[endpointRequest.endpoint].dataCenterLatency - input.cacheSizes[index];
+                if (solutionContainer.solution[index].indexOf(endpointRequest.videoNumber) !== -1) {
+                    requestTimeSaved = input.endpoints[endpointRequest.endpoint].dataCenterLatency -
+                        input.endpoints[endpointRequest.endpoint].connectedCacheLatencies[index];
+//                    console.log("Example endpoint request time: " + input.endpoints[endpointRequest.endpoint]);
+//                    console.log("Cache time: ", input.endpoints[endpointRequest.endpoint].connectedCacheLatencies[index]);
+//                    console.log(requestTimeSaved);
                 }
             });
+
+//            console.log("Time saved " + requestTimeSaved);
 
             score += requestTimeSaved * endpointRequest.count;
         });
