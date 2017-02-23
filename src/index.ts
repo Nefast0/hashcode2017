@@ -1,8 +1,8 @@
 
 import {InputService, INPUT_KITTENS, EXAMPLE} from './InputService';
 
-input = InputService.read(EXAMPLE);
-
+ InputService.read(EXAMPLE);
+/*
 const POPULATION_SIZE = 100;
 const ITERATIONS_NUMBER = 1000;
 
@@ -10,7 +10,7 @@ var population = GeneratePopulation(POPULATION_SIZE, input); // randomly generat
 
 /*
  * solution = { solution => { Cindex => [Vid, Vid, ...], Cindex => { ... } }, score => 123 }
- */
+
 
 var iteration = 0;
 while (iteration++ < ITERATIONS_NUMBER)
@@ -39,3 +39,4 @@ population.foreach( function(solution)
 });
 
 OutputService.write(best);
+*/
