@@ -1,4 +1,4 @@
 
-import {InputService, INPUT_KITTENS} from './InputService';
+import {InputService, INPUT_KITTENS, EXAMPLE} from './InputService';
 
-InputService.read(INPUT_KITTENS);
+InputService.read(EXAMPLE);
