@@ -30,6 +30,7 @@ export class _InputService {
         var currentEndpoint: Endpoint = null;
         const thisReference = this;
 
+
         var lineReader = require('readline').createInterface({
             input: require('fs').createReadStream(filename)
         });
@@ -41,56 +42,64 @@ export class _InputService {
             console.log(fileStructure);
         });
 
-        lineReader.on('line', (line) => {
-            currentLineNumber++;
+        fs.readFile(filename, (err, data) => {
+            data.toString().split('\n').forEach(line => {
 
-            const splitLine = line.split(' ');
+                currentLineNumber++;
 
-            if (currentLineNumber === 1) {
-                fileStructure = {
-                    videoCount: +splitLine[0],
-                    endpointCount: +splitLine[1],
-                    requestDescriptionCount: +splitLine[2],
-                    cacheCount: +splitLine[3],
-                    cacheSizes: [],
-                    endpoints: [],
-                    videoSizes: []
-                };
+                const splitLine = line.split(' ');
 
-                for (let x = 0; x < fileStructure.cacheCount; x++) {
-                    fileStructure.cacheSizes.push(+splitLine[4]);
+                if (currentLineNumber === 1) {
+                    fileStructure = {
+                        videoCount: +splitLine[0],
+                        endpointCount: +splitLine[1],
+                        requestDescriptionCount: +splitLine[2],
+                        cacheCount: +splitLine[3],
+                        videoSizes: [],
+                        cacheSizes: [],
+                        endpoints: []
+                    };
+
+                    for (let x = 0; x < fileStructure.cacheCount; x++) {
+                        fileStructure.cacheSizes.push(+splitLine[4]);
+                    }
+
+                    return;
                 }
 
-                return;
-            }
+                if (currentLineNumber === 2) {
+                    fileStructure.videoSizes = line.split(' ').map((l) => +l);
+                    currentlyEndpointDescription = true;
 
-            if (currentLineNumber === 2) {
-                fileStructure.videoSizes = line.split(' ').map((l) => +l);
-                currentlyEndpointDescription = true;
+                    return;
+                }
 
-                return;
-            }
+                if (nextNLinesAreEndpointCacheDescriptions--) {
+                    currentEndpoint.connectedCacheLatencies[+splitLine[0]] = +splitLine[1];
 
-            if (currentlyEndpointDescription) {
+                    if (nextNLinesAreEndpointCacheDescriptions == 0) {
+                        currentlyEndpointDescription = true;
+                    }
 
-                currentEndpoint = {
-                    dataCenterLatency: +splitLine[0],
-                    cacheCount: +splitLine[1],
-                    connectedCacheLatencies: []
-                };
+                    return;
+                }
 
-                fileStructure.endpoints.push(currentEndpoint);
-                currentlyEndpointDescription = false;
-                nextNLinesAreEndpointCacheDescriptions = currentEndpoint.cacheCount;
-                return;
-            }
+                if (currentlyEndpointDescription) {
 
-            if (nextNLinesAreEndpointCacheDescriptions--) {
-                currentEndpoint.connectedCacheLatencies[+splitLine[0]] = +splitLine[1];
-                return;
-            }
+                    currentEndpoint = {
+                        dataCenterLatency: +splitLine[0],
+                        cacheCount: +splitLine[1],
+                        connectedCacheLatencies: []
+                    };
 
-            currentlyEndpointDescription = true;
+                    fileStructure.endpoints.push(currentEndpoint);
+                    currentlyEndpointDescription = false;
+                    nextNLinesAreEndpointCacheDescriptions = currentEndpoint.cacheCount;
+                    return;
+                }
+            });
+
+            console.log(fileStructure);
         });
     }
 }

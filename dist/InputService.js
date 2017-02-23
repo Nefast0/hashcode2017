@@ -1,4 +1,5 @@
 "use strict";
+var fs = require('fs');
 exports.INPUT_KITTENS = 'input/kittens.in';
 exports.EXAMPLE = 'input/example.in';
 var _InputService = (function () {
@@ -15,47 +16,53 @@ var _InputService = (function () {
         });
         var fileStructure;
         lineReader.on('end', function () {
+            console.log("end");
             console.log(fileStructure);
         });
-        lineReader.on('line', function (line) {
-            currentLineNumber++;
-            var splitLine = line.split(' ');
-            if (currentLineNumber === 1) {
-                fileStructure = {
-                    videoCount: +splitLine[0],
-                    endpointCount: +splitLine[1],
-                    requestDescriptionCount: +splitLine[2],
-                    cacheCount: +splitLine[3],
-                    cacheSizes: [],
-                    endpoints: [],
-                    videoSizes: []
-                };
-                for (var x = 0; x < fileStructure.cacheCount; x++) {
-                    fileStructure.cacheSizes.push(+splitLine[4]);
+        fs.readFile(filename, function (err, data) {
+            data.toString().split('\n').forEach(function (line) {
+                currentLineNumber++;
+                var splitLine = line.split(' ');
+                if (currentLineNumber === 1) {
+                    fileStructure = {
+                        videoCount: +splitLine[0],
+                        endpointCount: +splitLine[1],
+                        requestDescriptionCount: +splitLine[2],
+                        cacheCount: +splitLine[3],
+                        videoSizes: [],
+                        cacheSizes: [],
+                        endpoints: []
+                    };
+                    for (var x = 0; x < fileStructure.cacheCount; x++) {
+                        fileStructure.cacheSizes.push(+splitLine[4]);
+                    }
+                    return;
                 }
-                return;
-            }
-            if (currentLineNumber === 2) {
-                fileStructure.videoSizes = line.split(' ').map(function (l) { return +l; });
-                currentlyEndpointDescription = true;
-                return;
-            }
-            if (currentlyEndpointDescription) {
-                currentEndpoint = {
-                    dataCenterLatency: +splitLine[0],
-                    cacheCount: +splitLine[1],
-                    connectedCacheLatencies: []
-                };
-                fileStructure.endpoints.push(currentEndpoint);
-                currentlyEndpointDescription = false;
-                nextNLinesAreEndpointCacheDescriptions = currentEndpoint.cacheCount;
-                return;
-            }
-            if (nextNLinesAreEndpointCacheDescriptions--) {
-                currentEndpoint.connectedCacheLatencies[+splitLine[0]] = +splitLine[1];
-                return;
-            }
-            currentlyEndpointDescription = true;
+                if (currentLineNumber === 2) {
+                    fileStructure.videoSizes = line.split(' ').map(function (l) { return +l; });
+                    currentlyEndpointDescription = true;
+                    return;
+                }
+                if (nextNLinesAreEndpointCacheDescriptions--) {
+                    currentEndpoint.connectedCacheLatencies[+splitLine[0]] = +splitLine[1];
+                    if (nextNLinesAreEndpointCacheDescriptions == 0) {
+                        currentlyEndpointDescription = true;
+                    }
+                    return;
+                }
+                if (currentlyEndpointDescription) {
+                    currentEndpoint = {
+                        dataCenterLatency: +splitLine[0],
+                        cacheCount: +splitLine[1],
+                        connectedCacheLatencies: []
+                    };
+                    fileStructure.endpoints.push(currentEndpoint);
+                    currentlyEndpointDescription = false;
+                    nextNLinesAreEndpointCacheDescriptions = currentEndpoint.cacheCount;
+                    return;
+                }
+            });
+            console.log(fileStructure);
         });
     };
     return _InputService;
