@@ -1,50 +1,51 @@
 import { InputService, INPUT_KITTENS, EXAMPLE, FileStructure } from './InputService';
+import { PopulationService, Population, SolutionContainer } from './PopulationService';
 
-InputService.read(EXAMPLE);
-var input = InputService.read(EXAMPLE).then((fileStructure: FileStructure) => {
-    console.log(fileStructure);
+InputService.read(EXAMPLE).then((fileStructure: FileStructure) => {
+
+    run(fileStructure);
+
+//    console.log(JSON.stringify((PopulationService.generatePopulation(10, fileStructure))));
 });
 
-const POPULATION_SIZE = 100;
-const ITERATIONS_NUMBER = 1000;
+function run(input: FileStructure) {
+    const POPULATION_SIZE = 100;
+    const ITERATIONS_NUMBER = 1000;
 
+    let population = PopulationService.generatePopulation(POPULATION_SIZE, input);
 
-//var population = GeneratePopulation(POPULATION_SIZE, input); // randomly generates valid solutions and calculates scores as well
-var population = [];
+    var iteration = 0;
+    while (iteration++ < ITERATIONS_NUMBER) {
+        var new_generation: Population = {
+            solutions: []
+        };
 
-/*
- * solution = { solution => { Cindex => [Vid, Vid, ...], Cindex => { ... } }, score => 123 }
- */
+        while (new_generation.solutions.length < POPULATION_SIZE) {
+            var chosen = SelectChildren(population);
+            chosen = CrossChildren(chosen); // calculates score as well
+            chosen = MutateChildren(chosen);
 
-var iteration = 0;
-while (iteration++ < ITERATIONS_NUMBER) {
-    var new_generation = [];
+            new_generation.solutions.concat(chosen); // addes only solution that are better than average
+        }
 
-    while (new_generation.length < POPULATION_SIZE) {
-        var chosen = SelectChildren(population);
-        chosen = CrossChildren(chosen); // calculates score as well
-        chosen = MutateChildren(chosen);
-
-        new_generation.push(chosen); // addes only solution that are better than average
+        population = new_generation;
     }
-    ;
 
-    population = new_generation;
+    var best = population[0];
+    population.solutions.forEach(function (solution) {
+        if (best.score < solution.score) {
+            best = solution;
+        }
+    });
+
+    //OutputService.write(best);
 }
 
-var best = population[0];
-population.forEach(function (solution) {
-    if (best.score < solution.score) {
-        best = solution;
-    }
-});
 
-//OutputService.write(best);
-
-function SelectChildren(population) {
+function SelectChildren(population): SolutionContainer[] {
     const k = 10;
 
-    var chosen = [];
+    var chosen: SolutionContainer[] = [];
     var taken = {};
     for (var i = 0; i < k; i++) {
         var r = Math.floor(Math.random() * population.length);
