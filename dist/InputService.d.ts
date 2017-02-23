@@ -1,3 +1,4 @@
+/// <reference types="es6-promise" />
 export declare const INPUT_KITTENS: string;
 export declare const EXAMPLE: string;
 export interface FileStructure {
@@ -15,6 +16,6 @@ export interface Endpoint {
     connectedCacheLatencies: number[];
 }
 export declare class _InputService {
-    read(filename: string): void;
+    read(filename: string): Promise<FileStructure>;
 }
 export declare const InputService: _InputService;

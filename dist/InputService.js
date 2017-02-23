@@ -1,5 +1,6 @@
 "use strict";
 var fs = require('fs');
+var es6_promise_1 = require('es6-promise');
 exports.INPUT_KITTENS = 'input/kittens.in';
 exports.EXAMPLE = 'input/example.in';
 var _InputService = (function () {
@@ -11,58 +12,53 @@ var _InputService = (function () {
         var nextNLinesAreEndpointCacheDescriptions = 0;
         var currentEndpoint = null;
         var thisReference = this;
-        var lineReader = require('readline').createInterface({
-            input: require('fs').createReadStream(filename)
-        });
         var fileStructure;
-        lineReader.on('end', function () {
-            console.log("end");
-            console.log(fileStructure);
-        });
-        fs.readFile(filename, function (err, data) {
-            data.toString().split('\n').forEach(function (line) {
-                currentLineNumber++;
-                var splitLine = line.split(' ');
-                if (currentLineNumber === 1) {
-                    fileStructure = {
-                        videoCount: +splitLine[0],
-                        endpointCount: +splitLine[1],
-                        requestDescriptionCount: +splitLine[2],
-                        cacheCount: +splitLine[3],
-                        videoSizes: [],
-                        cacheSizes: [],
-                        endpoints: []
-                    };
-                    for (var x = 0; x < fileStructure.cacheCount; x++) {
-                        fileStructure.cacheSizes.push(+splitLine[4]);
+        return new es6_promise_1.Promise(function (resolve, reject) {
+            fs.readFile(filename, function (err, data) {
+                data.toString().split('\n').forEach(function (line) {
+                    currentLineNumber++;
+                    var splitLine = line.split(' ');
+                    if (currentLineNumber === 1) {
+                        fileStructure = {
+                            videoCount: +splitLine[0],
+                            endpointCount: +splitLine[1],
+                            requestDescriptionCount: +splitLine[2],
+                            cacheCount: +splitLine[3],
+                            videoSizes: [],
+                            cacheSizes: [],
+                            endpoints: []
+                        };
+                        for (var x = 0; x < fileStructure.cacheCount; x++) {
+                            fileStructure.cacheSizes.push(+splitLine[4]);
+                        }
+                        return;
                     }
-                    return;
-                }
-                if (currentLineNumber === 2) {
-                    fileStructure.videoSizes = line.split(' ').map(function (l) { return +l; });
-                    currentlyEndpointDescription = true;
-                    return;
-                }
-                if (nextNLinesAreEndpointCacheDescriptions--) {
-                    currentEndpoint.connectedCacheLatencies[+splitLine[0]] = +splitLine[1];
-                    if (nextNLinesAreEndpointCacheDescriptions == 0) {
+                    if (currentLineNumber === 2) {
+                        fileStructure.videoSizes = line.split(' ').map(function (l) { return +l; });
                         currentlyEndpointDescription = true;
+                        return;
                     }
-                    return;
-                }
-                if (currentlyEndpointDescription) {
-                    currentEndpoint = {
-                        dataCenterLatency: +splitLine[0],
-                        cacheCount: +splitLine[1],
-                        connectedCacheLatencies: []
-                    };
-                    fileStructure.endpoints.push(currentEndpoint);
-                    currentlyEndpointDescription = false;
-                    nextNLinesAreEndpointCacheDescriptions = currentEndpoint.cacheCount;
-                    return;
-                }
+                    if (nextNLinesAreEndpointCacheDescriptions--) {
+                        currentEndpoint.connectedCacheLatencies[+splitLine[0]] = +splitLine[1];
+                        if (nextNLinesAreEndpointCacheDescriptions == 0) {
+                            currentlyEndpointDescription = true;
+                        }
+                        return;
+                    }
+                    if (currentlyEndpointDescription) {
+                        currentEndpoint = {
+                            dataCenterLatency: +splitLine[0],
+                            cacheCount: +splitLine[1],
+                            connectedCacheLatencies: []
+                        };
+                        fileStructure.endpoints.push(currentEndpoint);
+                        currentlyEndpointDescription = false;
+                        nextNLinesAreEndpointCacheDescriptions = currentEndpoint.cacheCount;
+                        return;
+                    }
+                    resolve(fileStructure);
+                });
             });
-            console.log(fileStructure);
         });
     };
     return _InputService;
